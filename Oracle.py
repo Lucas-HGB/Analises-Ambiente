@@ -242,7 +242,7 @@ def get_oracle_configs():
 		try:
 			with open(r"/etc/oratab", "r") as oratab:
 				if args.debug:
-						print "Reading /etc/oratab"
+					print "Reading /etc/oratab"
 				lines = oratab.readlines()
 				config_lines = [line for line in lines if line[0] != "#" and line != "\n"]
 				for config in config_lines:
