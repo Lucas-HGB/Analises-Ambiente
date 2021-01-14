@@ -1,7 +1,8 @@
 #!/usr/bin/python2
 # -*- coding: UTF-8 -*-
-from cx_Oracle import connect
+from os import environ
 
+global scripts
 scripts = [
 	"""set lines 160
 col HOST_NAME for a60
@@ -232,32 +233,73 @@ set serveroutput on
 """
 ]
 
-def get_instance():
+
+
+
+def get_oracle_configs():
+	configs = {}
+	if arch().lower() == "linux":
+		try:
+			with open(r"/etc/oratab", "r") as oratab:
+				if args.debug:
+						print "Reading /etc/oratab"
+				lines = oratab.readlines()
+				config_lines = [line for line in lines if line[0] != "#" and line != "\n"]
+				for config in config_lines:
+					configs[config.split(":")[0]] = (config.split(":")[1])
+			return configs
+		except Exception as excp:
+			print excp
+
+def get_oracle_configs():
 	#Extrair SID em Linux usando etc/oratab
+        configs = {}
 	with open(r"etc\oratab", "r") as oratab:
 		lines = oratab.readlines()
 		config_line = [line for line in lines if line[0] != "#" and line != "\n"]
-		instance = config_line.split(":")[0]
-	return instance
+		for config in config_line:
+                        configs[config.split(":")[0]] = (config.split(":")[1])
+	return configs
 
-class Banco():
+class init_Banco():
 
-	def __init__(self):
-		pass
+	def __init__(self, user, password, instance, port = 1521, ip = "localhost"):
+                self.configs = get_oracle_configs()
+                self.set_environ(instance)
+                self.connect(user, password, instance, ip, port)
 
-	#Conexão com banco de dados
-	def connect(self, ip, user, password, instance, port = 1521):
-		try:
-			self.connection = connect(user,password, "%s:%s/%s" %s (ip, port, instance), encoding="UTF-8")
-			self.cursor = self.connection.cursor()
-		except:
-			print "Error estabilishing connection to database!"
+        def conect(self, user, password, ip, port, instance):
+                try:
+                        self.connection = connect(user,password, "%s:%s/%s" %s (ip, port, instance), encoding="UTF-8")
+                        self.cursor = self.connection.cursor()
+                except Exception as excp:
+                        print excp
+        def set_environ(self, instance):
+                environ["LD_LIBRARY_PATH"] = "%s/lib" % (self.configs[instance])
 
 	def run_command(self, command):
 		self.cursor.execute(command)
 		output = self.cursor.fetchall()
 		return output
 
+def choose_instance():
+        configs = get_oracle_configs()
+        exit = False
+        while not exit:
+                for instance, count in zip(configs.keys(), len(configs.keys())):
+                        print "%s - %s" % (count, instance)
+                print "%s - Sair" % (count + 1)
+                opc = input()
+                if opc != count + 1:
+                        Banco = init_Banco(ip = "localhost", user = raw_input("Database user:  "), password = raw_input("Password:  "), instance = configs.keys()[opc])
+                        extract_info = 0
+                        while extract_info != 14:
+                                print_menu()
+                                extract_info = input()
+                                Banco.run_command(scripts[extract_info])
+                elif opc == count + 1:
+                        exit = True
+                        break
 
 def print_menu():
 	print "0  - Dados da instância"
@@ -278,11 +320,8 @@ def print_menu():
 	
 
 def init():
-	Banco = Banco()
-	Banco.connect(ip = "localhost", user = "sys", password = "password", instance =get_instance())
 	opc = 0
-	while opc != 14:
-		print_menu()
-		opc = int(input())
-		output = Banco.run_command(scripts[opc])
-		print output
+	choose_instance()
+
+if __name__ == "__main__":
+        init()

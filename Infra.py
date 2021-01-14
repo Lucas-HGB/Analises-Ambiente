@@ -2,17 +2,55 @@
 # -*- coding: utf-8 -*-
 from os import system
 
+def hostname():
+    system("hostname")
+
+def hostnamectl():
+    system("hostnamectl")
+
+def sys_vers():
+    system("cat /etc/redhat-version")
+
+def rede():
+    system("ifconfig")
+
 def cpu():
-    system('cat /proc/cpuinfo | grep "model name"')
+    opc = 0
+    while opc != 4:
+        print "1 - Modelo"
+        print "2 - Quantidade de vCPUs"
+        print "3 - Quantidade de CPU Físicas"
+        print "4 - Sair"
+        opc = input()
+        if opc == 1:
+            system('cat /proc/cpuinfo | grep "model name" | sort -u')
+        elif opc == 2:
+            system('cat /proc/cpuinfo | grep "model name" | wc -l')
+        elif opc == 3:
+            system('cat /proc/cpuinfo | grep "physical id" | sort -u |wc -l')
+        elif opc == 4:
+            break
 
-def mem():
-    system("free -m")
+def memoria_em_gb():
+    system("free -mg")
 
-def disk():
+def swap():
+    system("cat /proc/swaps")
+
+def uso_de_swap():
+    system("grep Swap /proc/meminfo")
+
+def discos():
     system("df -h")
 
-def process():
-    system("top")
+def io_discos():
+    system("iostat")
+
+def status_server():
+    system("vmstat 1 5")
+
+def top_processamento():
+    system("htop")
 
 def reboot():
     system("last reboot")
@@ -20,39 +58,59 @@ def reboot():
 def shutdown():
     system("last shutdown")
 
-def sys_vers():
-    system("cat /etc/redhat-version")
-
 def print_menu():
-    print "0  - Informações da CPU"
-    print "1  - Memória"
-    print "2  - Discos"
-    print "3  - Processos"
-    print "4  - Última reinicialização"
-    print "5  - Último desligamento"
-    print "6  - Versão RHEL"
-    print "7  - Sair"
+    print "0  - Hostname"
+    print "1  - Dados da máquina (RedHat >= 7)"
+    print "2  - Versao RHEL"
+    print "3  - Configurações de Rede"
+    print "4  - CPU"
+    print "5  - Memória em GB"
+    print "6  - SWAP"
+    print "7  - Uso de Swap"
+    print "8  - Discos"
+    print "9  - IO Discos"
+    print "10 - Coleta de Status do Server"
+    print "11 - Top processamento"
+    print "12 - Last shutdown"
+    print "13 - Last reboot"
+    print "14 - Sair"
 
 def init():
     opc = 0
-    while opc != 6:
+    while opc != 14:
         print_menu()
         opc = int(input())
         print "\n\n" 
         if opc == 0:
-            cpu()
+            hostname()
         elif opc == 1:
-            mem()
+            hostnamectl()
         elif opc == 2:
-            disk()
+            sys_ver()
         elif opc == 3:
-            process()
+            rede()
         elif opc == 4:
-            reboot()
+            cpu()
         elif opc == 5:
-            shutdown()
+            memoria_em_gb()
         elif opc == 6:
-            sys_vers()
+            swap()
         elif opc == 7:
+            uso_de_swap()
+        elif opc == 8:
+            discos()
+        elif opc == 9:
+            io_discos()
+        elif opc == 10:
+            status_server()
+        elif opc == 11:
+            top_processamento()
+        elif opc == 12:
+            reboot()
+        elif opc == 13:
+            shutdown()
+        elif opc == 14:
             break
         print "\n\n"
+if __name__ == "__main__":
+    init()
