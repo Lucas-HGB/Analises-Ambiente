@@ -1,6 +1,13 @@
 #!/usr/bin/python2
 # -*- coding: UTF-8 -*-
 from os import environ
+from platform import system as arch
+
+def clear_screen():
+    if arch().lower() == "windows":
+        system("cls")
+    else:
+        system("clear")
 
 global scripts
 scripts = [
