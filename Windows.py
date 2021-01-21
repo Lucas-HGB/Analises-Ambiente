@@ -1,31 +1,50 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 from os import system
+from platform import system as arch
 from wmi import WMI
 from Convert import math_size
 
-global manager
-manager = WMI()
+def clear_screen():
+    if arch().lower() == "windows":
+        system("cls")
+    else:
+        system("clear")
 
-def mem_use():
-    printed = []
-    blacklist = [
-        "WindowsInternal.ComposableShell.Experiences.TextInput.InputApp.exe",
-        "StartMenuExperienceHost.exe",
-        "svchost.exe",
-        "WirelessKB850NotificationService.exe",
-        "System Idle Process",
-        "System"
-    ]
-    print "PID" + "-"*15 + "Process name" + "-"*15 + "Memory Usage"
-    for process in manager.Win32_Process():
-        if  process.Name not in blacklist and process.Name not in printed:
-            if ".exe" in process.Name:
-                name = process.Name[0:-4]
-                print  str(process.ProcessId) + " "*(18 - len(str(process.ProcessId))) + str(name) + " "*(27 - len(name)) + str(process.WorkingSetSize)
-            else:
-                print  str(process.ProcessId) + " "*(18 - len(str(process.ProcessId))) + str(process.Name) + " "*(27 - len(process.Name)) + str(process.WorkingSetSize)
-            printed.append(process.Name)
+class TaskManager():
+
+    def __init__(self):
+        self.manager = WMI()
+        self.IDs = []
+        self.Names = []
+        self.WorkingSets = []
+        self.PercentProcessorTimes = []
+
+
+    def print_descending_mem(self):
+        for num in range(len(self.IDs)):
+            index = self.WorkingSets.index(max(self.WorkingSets))
+            print str(self.IDs[index]) + " "*(18 - len(str(self.IDs[index]))) + str(self.Names[index]) + " "*(27 - len(self.Names[index])) + str(self.WorkingSets[index]) + " "*(27 - len(str(self.WorkingSets[index]))) + str(self.PercentProcessorTimes[index])
+            self.WorkingSets.pop(index)
+
+    def mem_use(self):
+        printed = []
+        blacklist = [
+            "System Idle Process",
+            "System",
+            "WirelessKB850NotificationService",
+            "WindowsInternal.ComposableShell.Experiences.TextInput.InputApp"
+        ]
+        print "PID" + "-"*15 + "Process name" + "-"*15 + "Memory Usage" + "-"*15 + "CPU Usage"
+        for process in self.manager.Win32_PerfFormattedData_perfProc_Process():
+            if process.Name not in blacklist and process.Name not in printed and "#" not in process.Name:
+                self.IDs.append(int(process.IDprocess))
+                self.Names.append(process.Name)
+                self.WorkingSets.append(int(process.WorkingSet))
+                self.PercentProcessorTimes.append(int(process.PercentProcessorTime))
+                printed.append(process.Name)
+        self.print_descending_mem()
+    
 
 def disks():
     for physical_disk in manager.Win32_DiskDrive ():
@@ -42,16 +61,18 @@ def print_menu():
     print "1 - Discos"
 
 def init():
+    manager = TaskManager()
     exit = False
     while not exit:
         print_menu()
         opc = input()
-        print "\n"
+        clear_screen()
         if opc == 0:
-            mem_use()
+            manager.mem_use()
         elif opc == 1:
             disks()
 
 
 if __name__ == "__main__":
-    mem_use()
+    manager = TaskManager()
+    manager.mem_use()
