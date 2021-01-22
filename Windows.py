@@ -11,7 +11,7 @@ def clear_screen():
     else:
         system("clear")
 
-class TaskManager():
+class System_Manager():
 
     def __init__(self):
         self.manager = WMI()
@@ -46,12 +46,12 @@ class TaskManager():
         self.print_descending_mem()
     
 
-def disks():
-    for physical_disk in manager.Win32_DiskDrive ():
-        for partition in physical_disk.associators ("Win32_DiskDriveToDiskPartition"):
-            for logical_disk in partition.associators ("Win32_LogicalDiskToPartition"):
-                print "Hardware" + "-"*(len(physical_disk.Caption)-1) + "Partition" + "-"*(len(physical_disk.Caption)-1) + "Total Space" + "-"*(len(physical_disk.Caption)-1) + "Free Space"
-                print physical_disk.Caption + " "*10 + logical_disk.Caption + " "*23 + math_size(logical_disk.Size) + " "*21 + math_size(logical_disk.FreeSpace)
+    def disks(self):
+        for physical_disk in self.manager.Win32_DiskDrive ():
+            for partition in physical_disk.associators ("Win32_DiskDriveToDiskPartition"):
+                for logical_disk in partition.associators ("Win32_LogicalDiskToPartition"):
+                    print "Hardware" + "-"*(len(physical_disk.Caption)-1) + "Partition" + "-"*(len(logical_disk.Caption)+10) + "Total Space" + "-"*(len(logical_disk.size)-1) + "Free Space" + "-"*(len(logical_disk.FreeSpace)-1) + "Used Space"
+                    print physical_disk.Caption + " "*11 + logical_disk.Caption + " "*16 + math_size(logical_disk.Size) + " "*13 + math_size(logical_disk.FreeSpace) + " "*13 + math_size(logical_disk.UsedSpace)
 
 
 
@@ -61,7 +61,7 @@ def print_menu():
     print "1 - Discos"
 
 def init():
-    manager = TaskManager()
+    manager = System_Manager()
     exit = False
     while not exit:
         print_menu()
@@ -70,9 +70,9 @@ def init():
         if opc == 0:
             manager.mem_use()
         elif opc == 1:
-            disks()
+            manager.disks()
 
 
 if __name__ == "__main__":
-    manager = TaskManager()
-    manager.mem_use()
+    manager = System_Manager()
+    manager.disks()
