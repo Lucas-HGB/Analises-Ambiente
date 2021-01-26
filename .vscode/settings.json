@@ -1,8 +1,0 @@
-{
-    "python.pythonPath": "c:\\Python27\\python.exe",
-    "files.exclude": {
-        "**.pyc": true,
-        "**/.gitattributes": true,
-        "**/.vscode": true
-    }
-}
