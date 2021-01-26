@@ -15,21 +15,9 @@ def rede():
     system("ifconfig")
 
 def cpu():
-    opc = 0
-    while opc != 4:
-        print "1 - Modelo"
-        print "2 - Quantidade de vCPUs"
-        print "3 - Quantidade de CPU Físicas"
-        print "4 - Sair"
-        opc = input()
-        if opc == 1:
-            system('cat /proc/cpuinfo | grep "model name" | sort -u')
-        elif opc == 2:
-            system('cat /proc/cpuinfo | grep "model name" | wc -l')
-        elif opc == 3:
-            system('cat /proc/cpuinfo | grep "physical id" | sort -u |wc -l')
-        elif opc == 4:
-            break
+        system('cat /proc/cpuinfo | grep "model name" | sort -u')
+        system('cat /proc/cpuinfo | grep "model name" | wc -l')
+        system('cat /proc/cpuinfo | grep "physical id" | sort -u |wc -l')
 
 def memoria_em_gb():
     system("free -mg")

@@ -1,9 +1,12 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
-from Linux import init as Infra_Linux
-from Windows import init as Infra_Windows
-from Oracle import init as Oracle
 from platform import system as arch
+if arch().lower() == "windows":
+    from Windows import init as infra
+elif arch().lower() == "linux":
+    from Linux import init as infra
+from Oracle import init as Oracle
+
 from os import system
 
 def clear_screen():
@@ -21,8 +24,8 @@ while opc != 3:
     clear_screen()
     if opc == 1:
         if arch().lower() == "windows":
-            Infra_Windows()
+            infra()
         elif arch().lower() == "linux":
-            Infra_Linux()
+            infra()
     elif opc == 2:
        Oracle()
