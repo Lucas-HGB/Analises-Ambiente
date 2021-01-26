@@ -30,6 +30,7 @@ class Hardware():
 
 
     def list_disks(self):
+        ## To-do:
         # Checar integridade, https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-logicaldisk
         print "Performing Disk check, please wait"
         print "\n"
@@ -43,11 +44,6 @@ class Hardware():
                     #status = str(logical_disk.Chkdsk())[1]
                     status = str(logical_disk.BlockSize)
                     print physical_disk.Caption + " "*(37 - len(physical_disk.Caption)) + logical_disk.Caption + " "*(14) + math_size(logical_disk.Size) + " "*(20 - len(logical_disk.Size)) + "%s (%s%s)" % (math_size(logical_disk.FreeSpace), percent_free, r"%") + " "*(23 - len(logical_disk.FreeSpace) - len(str(percent_free)) + 1) + "%s (%s%s)" % (used_space, percent_used, r"%") + " "*(28 - len(str(used_space)) - len(str(percent_used)) + 1) + status
-        print "Legenda:"
-        print "0 = Check disk success"
-        print "1 = Locked and check disk scheduled on reboot"
-        print "2 or 4 = Unknow file system"
-        print "3 = Unknow error"
 
 class System():
 
@@ -67,6 +63,8 @@ class System():
             self.WorkingSets.pop(index)
 
     def mem_use(self):
+        ## To-do:
+        # Calc correct value for memory use per process
         printed = []
         blacklist = [
             "System Idle Process",
@@ -94,6 +92,8 @@ class System():
             printed.append(index)
 
     def cpu_use(self):
+        ## To-do:
+        # Calc correct value for CPU usage per process
         printed = []
         blacklist = [
             "System Idle Process",
@@ -112,6 +112,8 @@ class System():
         self.print_descending_cpu_usage()
 
     def rede(self):
+        ## To-do:
+        # Check way to clear screen after using this config, why 
         system("ipconfig /all")
         print "\n\n"
 
