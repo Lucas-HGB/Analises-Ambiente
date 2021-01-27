@@ -5,12 +5,11 @@ from platform import system as arch
 from subprocess import Popen, PIPE
 from wmi import WMI
 from Convert import math_size
+from win32evtlog import ReadEventLog, OpenEventLog, EVENTLOG_BACKWARDS_READ, EVENTLOG_SEQUENTIAL_READ, GetNumberOfEventLogRecords
+
 
 def clear_screen():
-    if arch().lower() == "windows":
-        system("cls")
-    else:
-        system("clear")
+    system("cls")
 
 class Hardware():
 
@@ -113,7 +112,7 @@ class System():
 
     def rede(self):
         ## To-do:
-        # Check way to clear screen after using this config, why 
+        # Check way to clear screen after using this func
         system("ipconfig /all")
         print "\n\n"
 
@@ -124,20 +123,31 @@ class System():
         print "Usuario: " + self.computer[0].Username.split("'\'")[-1]
         system('(cscript  "C:\Windows\System32\slmgr.vbs" /dli)')
 
-    def logs(self):
-        exit = False
-        while not exit:
-            print "1 - Sistema"
-            print "2 - Aplicação"
-            opc = input()
-            if opc == 1:
-                print "---Sistema---"
-                print "Número de eventos: " + str(self.manager.Win32_NTEventLogFile()[-2].NumberOfRecords)
-            elif opc == 2:
-                print "---Aplicação---"
-                print "Número de eventos: " + str(self.manager.Win32_NTEventLogFile()[0].NumberOfRecords)
-                print "----Eventos----"
-                print self.manager.Win32_NTEventLogFile()[0]
+class Logs():
+
+    def __init__(self, logtype):
+        self.hand = OpenEventLog("localhost",logtype)
+        self.flags = EVENTLOG_BACKWARDS_READ|EVENTLOG_SEQUENTIAL_READ
+        self.events = []
+        print "Reading event logs, please wait"
+        added = []
+        while True:
+            events = ReadEventLog(self.hand, self.flags, 0)
+            if events:
+                for event in events:
+                    if event.EventID not in added and "microsoft" not in event.SourceName.lower().split("-") and :
+                        print "Event Name: " + str(event.SourceName)
+                        self.events.append(event.SourceName)
+                        added.append(event.EventID)
+
+    def __str__(self):
+        phrase = tipo + " events: " + str(GetNumberOfEventLogRecords(OpenEventLog(hand))) + "\n"
+        return phrase
+
+    def get_common_events(self):
+        count = 0
+        
+
 
 def print_menu():
     print "\n"
@@ -153,8 +163,7 @@ def init():
     clear_screen()
     sys = System()
     hardware = Hardware()
-    exit = False
-    while not exit:
+    while True:
         print_menu()
         opc = input()
         clear_screen()
@@ -170,13 +179,28 @@ def init():
         elif opc == 5:
             sys.cpu_use()
         elif opc == 6:
-            sys.logs()
+            
+            while True:
+                print "1 - Sistema"
+                print "2 - Aplicação"
+                print "3 - Sair"
+                opc = input()
+                if opc == 1:
+                    logs = Logs("System")
+                    logs.get_common_events()
+                    pass
+                    # Logs de sistema
+                elif opc == 2:
+                    logs = Logs("Application")
+                    pass
+                    # Logs de aplicação
+                elif opc == 3:
+                    break
         elif opc == 99:
-            exit = True
             break
 
 
 if __name__ == "__main__":
     sys = System()
     hardware = Hardware()
-    hardware.list_disks()
+    logs = Logs("System")
