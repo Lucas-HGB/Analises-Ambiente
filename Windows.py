@@ -5,8 +5,8 @@ from platform import system as arch
 from subprocess import Popen, PIPE
 from wmi import WMI
 from Convert import math_size
-from win32evtlog import ReadEventLog, OpenEventLog, EVENTLOG_BACKWARDS_READ, EVENTLOG_SEQUENTIAL_READ, GetNumberOfEventLogRecords
-
+from win32evtlog import ReadEventLog, OpenEventLog, EVENTLOG_BACKWARDS_READ, EVENTLOG_SEQUENTIAL_READ, GetNumberOfEventLogRecords, CloseEventLog
+from win32evtlogutil import SafeFormatMessage
 
 def clear_screen():
     system("cls")
@@ -126,19 +126,60 @@ class System():
 class Logs():
 
     def __init__(self, logtype):
-        self.hand = OpenEventLog("localhost",logtype)
         self.flags = EVENTLOG_BACKWARDS_READ|EVENTLOG_SEQUENTIAL_READ
         self.events = []
-        print "Reading event logs, please wait"
+        self.logtype = logtype
+
+
+    def read_logs(self):
+        blacklist = [
+        ## Aplicação
+        "MsiInstaller",
+        "Windows Search Service Profile Notification",
+        "Group Policy Printers",
+        "Outlook"
+        "VSS",
+        "Software Protection Platform Service",
+        "Windows Search Service",
+        "Windows Search Service",
+        "ESENT",
+        "Desktop Window Manager",
+        "Windows Error Reporting",
+        "Group Policy Drive Maps",
+        "SecurityCenter",
+        "Wlclntfy",
+        "edgeupdate",
+        "System Restore",
+
+        ## Sistema
+        "Service Control Manager"
+        ]
+        self.hand = OpenEventLog("localhost",self.logtype)
         added = []
-        while True:
-            events = ReadEventLog(self.hand, self.flags, 0)
-            if events:
-                for event in events:
-                    if event.EventID not in added and "microsoft" not in event.SourceName.lower().split("-") and :
-                        print "Event Name: " + str(event.SourceName)
-                        self.events.append(event.SourceName)
-                        added.append(event.EventID)
+        print "ID" + "-"*20 + "Name" + "-"*15 + "Category" + "-"*12 + "Time Generated"
+        events = 1
+        while events:
+            events = [f for f in ReadEventLog(self.hand, self.flags, 0) if f]
+            for event in events:
+                if event.EventID not in added and "microsoft" not in event.SourceName.lower().split("-") and event.SourceName not in blacklist and event.EventType >= 2:
+                    print str(event.EventID).replace("-", "") + " "*(22 - len(str(event.EventID).replace("-", ""))) + event.SourceName + " "*(22 - len(str(event.SourceName))) + str(event.EventType) + " "*(16 - len(str(event.EventType))) + str(event.TimeGenerated)
+                    self.events.append(event.SourceName)
+                    added.append(event.EventID)
+
+    def read_log(self, eventid):
+        self.hand = OpenEventLog("localhost",self.logtype)
+        added = []
+        events = 1
+        while events:
+            events = [f for f in ReadEventLog(self.hand, self.flags, 0) if f]
+            for event in events:
+                if event.EventID == eventid and event.EventID not in added:
+                    added.append(event.EventID)
+                    try:
+                        print SafeFormatMessage(event, self.logtype)
+                    except UnicodeEncodeError:
+                        print "Unicode error while reading log"
+                        continue
 
     def __str__(self):
         phrase = tipo + " events: " + str(GetNumberOfEventLogRecords(OpenEventLog(hand))) + "\n"
@@ -179,7 +220,6 @@ def init():
         elif opc == 5:
             sys.cpu_use()
         elif opc == 6:
-            
             while True:
                 print "1 - Sistema"
                 print "2 - Aplicação"
@@ -187,13 +227,24 @@ def init():
                 opc = input()
                 if opc == 1:
                     logs = Logs("System")
-                    logs.get_common_events()
-                    pass
-                    # Logs de sistema
+                    logs.read_logs()
+                    print "Insira ID de um log específico para examina-lo:"
+                    print "Ou digite 'exit' para sair"
+                    ler = raw_input()
+                    if ler == "exit":
+                        break
+                    else:
+                        logs.read_log(int(ler))
                 elif opc == 2:
                     logs = Logs("Application")
-                    pass
-                    # Logs de aplicação
+                    logs.read_logs()
+                    print "Insira ID de um log específico para examina-lo:"
+                    print "Ou digite 'exit' para sair"
+                    ler = raw_input()
+                    if ler == "exit":
+                        break
+                    else:
+                        logs.read_log(int(ler))
                 elif opc == 3:
                     break
         elif opc == 99:
@@ -203,4 +254,5 @@ def init():
 if __name__ == "__main__":
     sys = System()
     hardware = Hardware()
-    logs = Logs("System")
+    #logs = Logs("System")
+    init()
