@@ -22,6 +22,10 @@ def cpu():
 def memoria_em_gb():
     system("free -mg")
 
+
+def linux_ver():
+    system("cat /proc/version")
+    
 def swap():
     system("cat /proc/swaps")
 

@@ -1,10 +1,13 @@
 #!/usr/bin/python2
 # -*- coding: UTF-8 -*-
 from os import environ
-from platform import system as arch
+from platform import system
+
+global os
+os = system().lower()
 
 def clear_screen():
-    if arch().lower() == "windows":
+    if os == "windows":
         system("cls")
     else:
         system("clear")
@@ -261,11 +264,14 @@ def get_oracle_configs():
 def get_oracle_configs():
 	#Extrair SID em Linux usando etc/oratab
         configs = {}
-	with open(r"etc\oratab", "r") as oratab:
-		lines = oratab.readlines()
-		config_line = [line for line in lines if line[0] != "#" and line != "\n"]
-		for config in config_line:
-                        configs[config.split(":")[0]] = (config.split(":")[1])
+        if os == "linux":
+                with open(r"etc\oratab", "r") as oratab:
+                        lines = oratab.readlines()
+                        config_line = [line for line in lines if line[0] != "#" and line != "\n"]
+                        for config in config_line:
+                                configs[config.split(":")[0]] = (config.split(":")[1])
+        elif os == "windows":
+                print "Windows"
 	return configs
 
 class init_Banco():
@@ -320,7 +326,7 @@ def print_menu():
 	print "8  - Advisors"
 	print "9  - Data Dictionary gets"
 	print "10 - Table Scan"
-	print "11 - Database Mises"
+	print "11 - Database Misses"
 	print "12 - Blocos Buffer Cache"
 	print "13 - Memória Oracle"
 	print "14 - Sair\n"

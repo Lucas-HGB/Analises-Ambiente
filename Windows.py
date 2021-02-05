@@ -31,6 +31,7 @@ class Hardware():
     def list_disks(self):
         ## To-do:
         # Checar integridade, https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-logicaldisk
+        status = "0"
         print "Performing Disk check, please wait"
         print "\n"
         print "Hardware" + "-"*(25) + "Partition" + "-"*(10) + "Total Space" + "-"*(10) + "Free Space" + "-"*(15) + "Used Space" + "-"*(15) + "Integridade"
@@ -41,7 +42,7 @@ class Hardware():
                     percent_free = round((float(str(logical_disk.FreeSpace).split()[0]) * 100) / float(str(logical_disk.Size).split()[0]), 1)
                     percent_used =  round((100 - percent_free), 1)
                     #status = str(logical_disk.Chkdsk())[1]
-                    status = str(logical_disk.BlockSize)
+                    #status = str(physical_disk.HealthStatus)
                     print physical_disk.Caption + " "*(37 - len(physical_disk.Caption)) + logical_disk.Caption + " "*(14) + math_size(logical_disk.Size) + " "*(20 - len(logical_disk.Size)) + "%s (%s%s)" % (math_size(logical_disk.FreeSpace), percent_free, r"%") + " "*(23 - len(logical_disk.FreeSpace) - len(str(percent_free)) + 1) + "%s (%s%s)" % (used_space, percent_used, r"%") + " "*(28 - len(str(used_space)) - len(str(percent_used)) + 1) + status
 
 class System():
@@ -77,7 +78,6 @@ class System():
                 self.IDs.append(int(process.IDprocess))
                 self.Names.append(process.Name)
                 self.WorkingSets.append(int(process.WorkingSet))
-                self.PercentProcessorTimes.append(int(process.PercentProcessorTime))
                 printed.append(process.Name)
         self.print_descending_mem()
 
@@ -157,14 +157,21 @@ class Logs():
         self.hand = OpenEventLog("localhost",self.logtype)
         added = []
         print "ID" + "-"*20 + "Name" + "-"*15 + "Category" + "-"*12 + "Time Generated"
-        events = 1
-        while events:
+        events = [0]
+        count = 0
+        while len(events) > 0:
             events = [f for f in ReadEventLog(self.hand, self.flags, 0) if f]
+            if count % 50 == 0:
+                print "Reading logs, please wait " + str(count)
             for event in events:
-                if event.EventID not in added and "microsoft" not in event.SourceName.lower().split("-") and event.SourceName not in blacklist and event.EventType >= 2:
-                    print str(event.EventID).replace("-", "") + " "*(22 - len(str(event.EventID).replace("-", ""))) + event.SourceName + " "*(22 - len(str(event.SourceName))) + str(event.EventType) + " "*(16 - len(str(event.EventType))) + str(event.TimeGenerated)
-                    self.events.append(event.SourceName)
-                    added.append(event.EventID)
+                 count += 1
+            if event.EventID not in added and "microsoft" not in event.SourceName.lower().split("-") and event.SourceName not in blacklist and event.EventType >= 2:
+                print str(event.EventID).replace("-", "") + " "*(22 - len(str(event.EventID).replace("-", ""))) + event.SourceName + " "*(22 - len(str(event.SourceName))) + str(event.EventType) + " "*(16 - len(str(event.EventType))) + str(event.TimeGenerated)
+                self.events.append(event.SourceName)
+                added.append(event.EventID)
+            if len(events) == 0:
+                break
+            
 
     def read_log(self, eventid):
         self.hand = OpenEventLog("localhost",self.logtype)
@@ -187,7 +194,6 @@ class Logs():
 
     def get_common_events(self):
         count = 0
-        
 
 
 def print_menu():
@@ -252,7 +258,11 @@ def init():
 
 
 if __name__ == "__main__":
-    sys = System()
-    hardware = Hardware()
-    #logs = Logs("System")
     init()
+    #sys = System()
+    #hardware = Hardware()
+    #hardware.list_disks()
+    #logs = Logs("Application")
+    #logs.read_logs()
+    #print "\nInsert Log ID"
+    #logs.read_log(int(input()))
