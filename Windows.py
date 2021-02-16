@@ -259,10 +259,3 @@ def init():
 
 if __name__ == "__main__":
     init()
-    #sys = System()
-    #hardware = Hardware()
-    #hardware.list_disks()
-    #logs = Logs("Application")
-    #logs.read_logs()
-    #print "\nInsert Log ID"
-    #logs.read_log(int(input()))
