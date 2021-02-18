@@ -161,8 +161,6 @@ class Logs():
         count = 0
         while len(events) > 0:
             events = [f for f in ReadEventLog(self.hand, self.flags, 0) if f]
-            if count % 50 == 0:
-                print "Reading logs, please wait " + str(count)
             for event in events:
                  count += 1
             if event.EventID not in added and "microsoft" not in event.SourceName.lower().split("-") and event.SourceName not in blacklist and event.EventType >= 2:

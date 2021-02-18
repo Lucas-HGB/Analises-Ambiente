@@ -1,0 +1,7 @@
+C:\Users\lucas.hoeltgebaum\Documents\GitHub\Analises-Ambiente\Windows\Windows\Windows\obj\Debug\Windows.csprojAssemblyReference.cache
+C:\Users\lucas.hoeltgebaum\Documents\GitHub\Analises-Ambiente\Windows\Windows\Windows\obj\Debug\Windows.csproj.CoreCompileInputs.cache
+C:\Users\lucas.hoeltgebaum\Documents\GitHub\Analises-Ambiente\Windows\Windows\Windows\bin\Debug\Windows.exe.config
+C:\Users\lucas.hoeltgebaum\Documents\GitHub\Analises-Ambiente\Windows\Windows\Windows\bin\Debug\Windows.exe
+C:\Users\lucas.hoeltgebaum\Documents\GitHub\Analises-Ambiente\Windows\Windows\Windows\bin\Debug\Windows.pdb
+C:\Users\lucas.hoeltgebaum\Documents\GitHub\Analises-Ambiente\Windows\Windows\Windows\obj\Debug\Windows.exe
+C:\Users\lucas.hoeltgebaum\Documents\GitHub\Analises-Ambiente\Windows\Windows\Windows\obj\Debug\Windows.pdb
