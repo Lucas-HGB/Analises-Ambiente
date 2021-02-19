@@ -27,6 +27,7 @@ namespace Windows
             return main_menu;
         }
 
+
         static void Main(string[] args)
         {
             Hardware infra = new Hardware();
@@ -43,7 +44,6 @@ namespace Windows
                         break;
                     case 2:
                         Console.Clear();
-                        // Network
                         break;
                     case 3:
                         Console.Clear();
@@ -90,10 +90,11 @@ namespace Windows
     public class Hardware
     {
 
-        public static string getPercentage(float total, float usado)
+        public static decimal getPercentage(decimal total, decimal valor)
         {
             // Calc percentage
-            return percentage;
+            decimal percentageValue = (valor * 100) / total;
+            return percentageValue;
         }
 
         // Convert Bytes to respective Size Measurement
@@ -130,9 +131,34 @@ namespace Windows
                     string tipo = "";
                     string usedSpace = getReadableSize(drive.TotalSize - drive.AvailableFreeSpace);
                     // Disk type translation
-                    if (Convert.ToString(drive.DriveType) == "Fixed") { tipo = "Interno"; } else if (Convert.ToString(drive.DriveType) == "Removable") { tipo = "Externo"; } else if (Convert.ToString(drive.DriveType) == "CDRom") { tipo = "CD/DVD"; }
-                    Console.WriteLine(String.Concat(Enumerable.Repeat(" ", 5 - Convert.ToString(drive.Name).Length)) + drive.Name + String.Concat(Enumerable.Repeat(" ", 10 - Convert.ToString(drive.Name).Length)) + tipo + String.Concat(Enumerable.Repeat(" ", 10 - Convert.ToString(drive.DriveType).Length)) + drive.DriveFormat + String.Concat(Enumerable.Repeat(" ", 18 - Convert.ToString(drive.DriveFormat).Length)) + getReadableSize(drive.TotalSize) + String.Concat(Enumerable.Repeat(" ", 22 - Convert.ToString(getReadableSize(drive.TotalSize)).Length)) + getReadableSize(drive.TotalFreeSpace) + String.Concat(Enumerable.Repeat(" ", 22 - Convert.ToString(getReadableSize(drive.TotalFreeSpace)).Length)) + usedSpace + String.Concat(Enumerable.Repeat(" ", 22 - usedSpace.Length)));
-                    Console.ReadLine();
+                    String health = "";
+                    if (Convert.ToString(drive.DriveType) == "Fixed") { tipo = "Interno"; } else if (Convert.ToString(drive.DriveType) == "Removable") { tipo = "Externo"; } else if (Convert.ToString(drive.DriveType) == "CDRom") { tipo = "CD/DVD"; } else if (Convert.ToString(drive.DriveType) == "Network") { tipo = " Rede"; }
+                    if (tipo != " Rede")
+                    {
+                        String command = "chkdsk " + drive.Name.Substring(0, 2);
+                        System.Diagnostics.Process processo = new System.Diagnostics.Process();
+                        processo.StartInfo.FileName = "Powershell.exe";
+                        processo.StartInfo.UseShellExecute = false;
+                        processo.StartInfo.RedirectStandardOutput = true;
+                        processo.StartInfo.Arguments = "/c " + command;
+                        processo.StartInfo.Verb = "runas";
+                        processo.Start();
+                        string output = processo.StandardOutput.ReadToEnd();
+                        processo.WaitForExit();
+                        Console.WriteLine(output);
+                        if (output == "Não há problemas")
+                        {
+                            health = "Íntrego";
+                        }
+                        else
+                        {
+                            health = "Não Íntegro";
+                        }
+                    }
+                    decimal percentFree = decimal.Round(getPercentage(drive.TotalSize, drive.TotalSize - drive.TotalFreeSpace));
+                    decimal percentUsed = decimal.Round(100 - percentFree);
+                    Console.WriteLine(String.Concat(Enumerable.Repeat(" ", 5 - Convert.ToString(drive.Name).Length)) + drive.Name + String.Concat(Enumerable.Repeat(" ", 10 - Convert.ToString(drive.Name).Length)) + tipo + String.Concat(Enumerable.Repeat(" ", 13 - Convert.ToString(tipo).Length)) + drive.DriveFormat + String.Concat(Enumerable.Repeat(" ", 17 - Convert.ToString(drive.DriveFormat).Length)) + getReadableSize(drive.TotalSize) + String.Concat(Enumerable.Repeat(" ", 20 - Convert.ToString(getReadableSize(drive.TotalSize)).Length)) + $"{getReadableSize(drive.TotalFreeSpace)} {percentFree}%" + String.Concat(Enumerable.Repeat(" ", 18 - Convert.ToString(getReadableSize(drive.TotalFreeSpace)).Length)) + $"{usedSpace} {percentUsed}%" + String.Concat(Enumerable.Repeat(" ", 22 - (usedSpace.Length + Convert.ToString(percentUsed).Length))));
+                    Console.Write(health);
                 }
             }
         }
