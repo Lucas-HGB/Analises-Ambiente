@@ -60,10 +60,12 @@ namespace Windows
                         // CPU Usage
                         break;
                     case 6:
-                        Console.Clear();
                         // Logs
+                        Console.Clear();
                         Console.WriteLine("1 - Aplicação");
                         Console.WriteLine("2 - Sistema");
+                        Console.WriteLine("3 - Segurança");
+                        Console.WriteLine("4 - Hardware");
                         int logtype = Convert.ToInt32(Console.ReadLine());
                         Console.Clear();
                         switch (logtype)
@@ -75,6 +77,14 @@ namespace Windows
                             case 2:
                                 Console.WriteLine("--- System Logs ---");
                                 sys.readlogs("system");
+                                break;
+                            case 3:
+                                Console.WriteLine("--- Security Logs ---");
+                                sys.readlogs("security");
+                                break;
+                            case 4:
+                                Console.WriteLine("--- Hardware Logs ---");
+                                sys.readlogs("hardware");
                                 break;
                         }
                         break;
@@ -97,7 +107,7 @@ namespace Windows
             ManagementObjectCollection cpu = search_wmi("Win32_Processor");
             foreach (ManagementObject obj in cpu)
             {
-
+                // Informações da CPU
                 Console.WriteLine($"Modelo: {obj["Name"]}");
                 Console.WriteLine($"Nr de Cores: {obj["NumberOfCores"]}");
                 Console.WriteLine($"Nr de Processadores lógicos: {obj["NumberOfLogicalProcessors"]}");
@@ -107,10 +117,11 @@ namespace Windows
             ManagementObjectCollection computer = search_wmi("Win32_ComputerSystem");
             foreach (ManagementObject obj in computer)
             {
+                // Informações do Computador
                 Console.WriteLine($"Memória: {getReadableSize(long.Parse(obj["TotalPhysicalMemory"].ToString()))}");
                 Console.WriteLine($"Hostname: {obj["Domain"]}/{obj["Caption"]}");
-                int func_dominio_int = Int32.Parse(obj["DomainRole"].ToString());
-                String func_dominio = "";
+                int func_dominio_int = Int32.Parse(obj["DomainRole"].ToString()); String func_dominio = ""; 
+                // Translates função no domínio de número para "Human-readable"
                 if (func_dominio_int == 0) { func_dominio = "Standalone Worksation"; }
                 else if (func_dominio_int == 1) { func_dominio = "Member Worksation"; }
                 else if (func_dominio_int == 2) { func_dominio = "Standalone Server"; }
@@ -171,31 +182,7 @@ namespace Windows
                     string tipo = "";
                     string usedSpace = getReadableSize(drive.TotalSize - drive.AvailableFreeSpace);
                     // Disk type translation
-
                     if (Convert.ToString(drive.DriveType) == "Fixed") { tipo = "Interno"; } else if (Convert.ToString(drive.DriveType) == "Removable") { tipo = "Externo"; } else if (Convert.ToString(drive.DriveType) == "CDRom") { tipo = "CD/DVD"; } else if (Convert.ToString(drive.DriveType) == "Network") { tipo = " Rede"; }
-                    //String health = "";
-                    //if (tipo != " rede")
-                    //{
-                    //    string command = "chkdsk " + drive.name.substring(0, 2);
-                    //    system.diagnostics.process processo = new system.diagnostics.process();
-                    //    processo.startinfo.filename = "powershell.exe";
-                    //    processo.startinfo.useshellexecute = false;
-                    //    processo.startinfo.redirectstandardoutput = true;
-                    //    processo.startinfo.arguments = "/c " + command;
-                    //    processo.startinfo.verb = "runas";
-                    //    processo.start();
-                    //    string output = processo.standardoutput.readtoend();
-                    //    processo.waitforexit();
-                    //    console.writeline(output);
-                    //    if (output == "não há problemas")
-                    //    {
-                    //        health = "íntrego";
-                    //    }
-                    //    else
-                    //    {
-                    //        health = "não íntegro";
-                    //    }
-                    //}
                     decimal percentUsed = decimal.Round(getPercentage(drive.TotalSize, drive.TotalSize - drive.TotalFreeSpace));
                     decimal percentFree = decimal.Round(100 - percentUsed);
                     Console.WriteLine(String.Concat(Enumerable.Repeat(" ", 5 - Convert.ToString(drive.Name).Length)) + drive.Name + String.Concat(Enumerable.Repeat(" ", 10 - Convert.ToString(drive.Name).Length)) + tipo + String.Concat(Enumerable.Repeat(" ", 13 - Convert.ToString(tipo).Length)) + drive.DriveFormat + String.Concat(Enumerable.Repeat(" ", 17 - Convert.ToString(drive.DriveFormat).Length)) + getReadableSize(drive.TotalSize) + String.Concat(Enumerable.Repeat(" ", 20 - Convert.ToString(getReadableSize(drive.TotalSize)).Length)) + $"{getReadableSize(drive.TotalFreeSpace)} {percentFree}%" + String.Concat(Enumerable.Repeat(" ", 22 - $"{getReadableSize(drive.TotalFreeSpace)} {percentFree}%".Length)) + $"{usedSpace} {percentUsed}%" + String.Concat(Enumerable.Repeat(" ", 18 - $"{usedSpace} {percentUsed}%".Length)));
@@ -211,6 +198,7 @@ public class Sistema
 
         public void rede()
         {
+            // Executes ipconfig /all command and prints output
             string command = "ipconfig /all";
             Process processo = new Process();
             processo.StartInfo.FileName = "powershell.exe";
@@ -240,10 +228,10 @@ public class Sistema
 
             EventLog[] logs_collect = EventLog.GetEventLogs(hostname);
             EventLogEntryCollection entries = logs_collect[0].Entries;
-            if (logtype == "system") { entries = logs_collect[1].Entries; } else if (logtype == "application") { entries = logs_collect[0].Entries; }
-            List<String> blacklist = new List<String>()
-            // Blacklist of specific Logs to Hide
+            if (logtype == "system") { entries = logs_collect[8].Entries; } else if (logtype == "application") { entries = logs_collect[0].Entries; } else if (logtype == "security") { entries = logs_collect[6].Entries; } else if (logtype == "hardware") { entries = logs_collect[1].Entries; }
+            List<String> blacklist = new List<String>() // Blacklist of specific Logs to Hide
                 {
+                // Application
                     "ESENT",
                     "Group Policy Printers",
                     "Windows Search Service",
@@ -270,7 +258,25 @@ public class Sistema
                     ".NET Runtime Optimization Service",
                     "Microsoft-Windows-Perflib",
                     "Microsoft-Windows-CAPI2",
-                    "Microsoft-Windows-Defrag"
+                    "Microsoft-Windows-Defrag",
+                // System
+                    "Microsoft-Windows-Hyper-V-VmSwitch",
+                    "Microsoft-Windows-WindowsUpdateClient",
+                    "Microsoft-Windows-StartupRepair",
+                    "Microsoft-Windows-Kernel-Power",
+                    "Microsoft-Windows-Kernel-Power",
+                    "Microsoft-Windows-GroupPolicy",
+                    "Microsoft-Windows-DNS-Client",
+                    "Microsoft-Windows-DriverFrameworks-UserMode",
+                    "Microsoft-Windows-Directory-Services-SAM",
+                    "Microsoft-Windows-Kernel-General",
+                    "Microsoft-Windows-TaskScheduler",
+                    "Microsoft-Windows-UserModePowerService",
+                    "Microsoft-Windows-Hyper-V-Hypervisor",
+                    "Microsoft-Windows-Time-Service",
+                    "Microsoft-Windows-DHCPv6-Client",
+                    "Microsoft-Windows-Kernel-Processor-Power",
+                    "Microsoft-Windows-WLAN-AutoConfig"
                    };
             List<long> added = new List<long>(); // List used to know which Log entry has already been added
             List<EventLogEntry> logs = new List<EventLogEntry>();
@@ -281,8 +287,8 @@ public class Sistema
                 if (!blacklist.Contains(entry.Source) && (!added.Contains(entry.InstanceId)))
                 // If log not in blacklist and log entry hasn't been added
                 {
-
-                    Console.WriteLine(count + String.Concat(Enumerable.Repeat(" ", 7 - Convert.ToString(count).Length)) + entry.InstanceId + String.Concat(Enumerable.Repeat(" ", 20 - Convert.ToString(entry.InstanceId).Length)) + entry.Source + String.Concat(Enumerable.Repeat(" ", 22 - Convert.ToString(entry.Source).Length)) + entry.EntryType + String.Concat(Enumerable.Repeat(" ", 18 - Convert.ToString(entry.EntryType).Length)) + entry.TimeGenerated);
+                    Console.WriteLine(entry.Source);
+                    //Console.WriteLine(count + String.Concat(Enumerable.Repeat(" ", 7 - Convert.ToString(count).Length)) + entry.InstanceId + String.Concat(Enumerable.Repeat(" ", 20 - Convert.ToString(entry.InstanceId).Length)) + entry.Source + String.Concat(Enumerable.Repeat(" ", 22 - Convert.ToString(entry.Source).Length)) + entry.EntryType + String.Concat(Enumerable.Repeat(" ", 18 - Convert.ToString(entry.EntryType).Length)) + entry.TimeGenerated);
                     added.Add(entry.InstanceId);
                     logs.Add(entry);
                     count += 1;
