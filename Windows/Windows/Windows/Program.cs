@@ -282,30 +282,37 @@ public class Sistema
             List<EventLogEntry> logs = new List<EventLogEntry>();
             Console.WriteLine("Index" + String.Concat(Enumerable.Repeat("-", 5)) + "ID" + String.Concat(Enumerable.Repeat("-", 15)) + "Name" + String.Concat(Enumerable.Repeat("-", 18)) + "Category" + String.Concat(Enumerable.Repeat("-", 12)) + "Time Generated");
             int count = 0; // Used for indexing Logs, easier to search later on
-            foreach (EventLogEntry entry in entries)
+            try
             {
-                if (!blacklist.Contains(entry.Source) && (!added.Contains(entry.InstanceId)))
-                // If log not in blacklist and log entry hasn't been added
+                foreach (EventLogEntry entry in entries)
                 {
-                    Console.WriteLine(entry.Source);
-                    //Console.WriteLine(count + String.Concat(Enumerable.Repeat(" ", 7 - Convert.ToString(count).Length)) + entry.InstanceId + String.Concat(Enumerable.Repeat(" ", 20 - Convert.ToString(entry.InstanceId).Length)) + entry.Source + String.Concat(Enumerable.Repeat(" ", 22 - Convert.ToString(entry.Source).Length)) + entry.EntryType + String.Concat(Enumerable.Repeat(" ", 18 - Convert.ToString(entry.EntryType).Length)) + entry.TimeGenerated);
-                    added.Add(entry.InstanceId);
-                    logs.Add(entry);
-                    count += 1;
+                    if (!blacklist.Contains(entry.Source) && (!added.Contains(entry.InstanceId)))
+                    // If log not in blacklist and log entry hasn't been added
+                    {
+                        //Console.WriteLine(entry.Source);
+                        Console.WriteLine(count + String.Concat(Enumerable.Repeat(" ", 7 - Convert.ToString(count).Length)) + entry.InstanceId + String.Concat(Enumerable.Repeat(" ", 20 - Convert.ToString(entry.InstanceId).Length)) + entry.Source + String.Concat(Enumerable.Repeat(" ", 22 - Convert.ToString(entry.Source).Length)) + entry.EntryType + String.Concat(Enumerable.Repeat(" ", 18 - Convert.ToString(entry.EntryType).Length)) + entry.TimeGenerated);
+                        added.Add(entry.InstanceId);
+                        logs.Add(entry);
+                        count += 1;
+                    }
                 }
-            }
-            do
-            {
-                Console.WriteLine("\n\nPlease insert log Index or enter any non-numeric value to exit");
-                string idx = Console.ReadLine();
-                Console.WriteLine("\n\n");
-                try
+                do
                 {
-                    if (idx.All(char.IsDigit)) { readSinglelog(logs[Convert.ToInt32(idx)]); } // If user passed in Int value to get specific Log info 
-                    else { break; }
-                } catch (FormatException) { break; }
+                    Console.WriteLine("\n\nPlease insert log Index or enter any non-numeric value to exit");
+                    string idx = Console.ReadLine();
+                    Console.WriteLine("\n\n");
+                    try
+                    {
+                        if (idx.All(char.IsDigit)) { readSinglelog(logs[Convert.ToInt32(idx)]); } // If user passed in Int value to get specific Log info 
+                        else { break; }
+                    }
+                    catch (FormatException) { break; }
 
-            } while (true); // Loop readSingleLog until user inputs non-numeric value.
+                } while (true); // Loop readSingleLog until user inputs non-numeric value.
+            }
+            catch (InvalidOperationException) { Console.WriteLine("General Error"); }
+            catch (System.Security.SecurityException) { Console.WriteLine("Permission error"); }
+
         }
     }
        
