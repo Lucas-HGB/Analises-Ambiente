@@ -243,98 +243,78 @@ set serveroutput on
 """
 ]
 
+class oratabNotFound(Exception):
+        print "Oratab not found!"
+        pass
 
+def get_instances():
+    #Extrair SID em Linux usando etc/oratab
+    instances = []
+    if os == "linux":
+        try:
+            with open(r"etc\oratab", "r") as oratab:
+                [instances.append(line.spplit(":"[0])) for line in oratab.readlines() if line[0] != "#" and line != "\n"]
+        except IOError:
+                raise oratabNotFound
+    elif os == "windows":
+        print "Windows list instances not yet implemented"
+    return instances
 
+class Banco():
 
-def get_oracle_configs():
-	configs = {}
-	if arch().lower() == "linux":
-		try:
-			with open(r"/etc/oratab", "r") as oratab:
-				if args.debug:
-					print "Reading /etc/oratab"
-				lines = oratab.readlines()
-				config_lines = [line for line in lines if line[0] != "#" and line != "\n"]
-				for config in config_lines:
-					configs[config.split(":")[0]] = (config.split(":")[1])
-			return configs
-		except Exception as excp:
-			print excp
+    def __init__(self, user, password, instance, ip, port = 1521):
+        self.connect(user, password, instance, ip, port)
 
-def get_oracle_configs():
-	#Extrair SID em Linux usando etc/oratab
-        configs = {}
-        if os == "linux":
-                with open(r"etc\oratab", "r") as oratab:
-                        lines = oratab.readlines()
-                        config_line = [line for line in lines if line[0] != "#" and line != "\n"]
-                        for config in config_line:
-                                configs[config.split(":")[0]] = (config.split(":")[1])
-        elif os == "windows":
-                print "Windows"
-	return configs
+    def conect(self, user, password, ip, port, instance):
+        from cx_Oracle import connect
+        try:
+            self.connection = connect(user,password, "%s:%s/%s" % (ip, port, instance), encoding="UTF-8")
+            self.cursor = self.connection.cursor()
+        except Exception as excp:
+            print excp
 
-class init_Banco():
+    def run_command(self, command):
+        self.cursor.execute(command)
+        output = self.cursor.fetchall()
+        return output
 
-	def __init__(self, user, password, instance, port = 1521, ip = "localhost"):
-                self.configs = get_oracle_configs()
-                self.set_environ(instance)
-                self.connect(user, password, instance, ip, port)
-
-        def conect(self, user, password, ip, port, instance):
-                try:
-                        self.connection = connect(user,password, "%s:%s/%s" %s (ip, port, instance), encoding="UTF-8")
-                        self.cursor = self.connection.cursor()
-                except Exception as excp:
-                        print excp
-        def set_environ(self, instance):
-                environ["LD_LIBRARY_PATH"] = "%s/lib" % (self.configs[instance])
-
-	def run_command(self, command):
-		self.cursor.execute(command)
-		output = self.cursor.fetchall()
-		return output
-
-def choose_instance():
-        configs = get_oracle_configs()
-        exit = False
-        while not exit:
-                for instance, count in zip(configs.keys(), len(configs.keys())):
-                        print "%s - %s" % (count, instance)
-                print "%s - Sair" % (count + 1)
-                opc = input()
-                if opc != count + 1:
-                        Banco = init_Banco(ip = "localhost", user = raw_input("Database user:  "), password = raw_input("Password:  "), instance = configs.keys()[opc])
-                        extract_info = 0
-                        while extract_info != 14:
-                                print_menu()
-                                extract_info = input()
-                                Banco.run_command(scripts[extract_info])
-                elif opc == count + 1:
-                        exit = True
-                        break
+def list_instances():
+    configs = get_instances()
+    for instance, count in zip(configs.keys(), len(configs.keys())):
+        print "%s - %s" % (count, instance)
+    opc = input()
+    instance = configs.keys()[opc]
+    return instance
 
 def print_menu():
-	print "0  - Dados da instância"
-	print "1  - Versão dos produtos instalados"
-	print "2  - Configurações de NLS da Instância"
-	print "3  - Informações sobre os controlfiles"
-	print "4  - Informações sobre Redologs"
-	print "5  - Tablespaces"
-	print "6  - Parâmetros da Instância"
-	print "7  - Hits de Memória do Oracle"
-	print "8  - Advisors"
-	print "9  - Data Dictionary gets"
-	print "10 - Table Scan"
-	print "11 - Database Misses"
-	print "12 - Blocos Buffer Cache"
-	print "13 - Memória Oracle"
-	print "14 - Sair\n"
+    print "0  - Dados da instância"
+    print "1  - Versão dos produtos instalados"
+    print "2  - Configurações de NLS da Instância"
+    print "3  - Informações sobre os controlfiles"
+    print "4  - Informações sobre Redologs"
+    print "5  - Tablespaces"
+    print "6  - Parâmetros da Instância"
+    print "7  - Hits de Memória do Oracle"
+    print "8  - Advisors"
+    print "9  - Data Dictionary gets"
+    print "10 - Table Scan"
+    print "11 - Database Misses"
+    print "12 - Blocos Buffer Cache"
+    print "13 - Memória Oracle"
+    print "14 - Sair\n"
 	
 
 def init():
-	opc = 0
-	choose_instance()
+    opc = 0
+    instance = list_instances()
+    Banco = Banco(ip = "localhost", user = raw_input("Database user:  "), password = raw_input("Password:  "), instance = instance)
+    while True:
+        print_menu()
+        extract_info = input()
+        if extract_info != 14:
+            print Banco.run_command(scripts[extract_info])
+        else:
+            break
 
 if __name__ == "__main__":
-        init()
+    init()

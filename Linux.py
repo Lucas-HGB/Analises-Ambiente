@@ -8,20 +8,17 @@ def hostname():
 def hostnamectl():
     system("hostnamectl")
 
-def sys_vers():
-    system("cat /etc/redhat-version")
-
 def rede():
     system("ifconfig")
 
 def cpu():
-        system('cat /proc/cpuinfo | grep "model name" | sort -u')
-        system('cat /proc/cpuinfo | grep "model name" | wc -l')
-        system('cat /proc/cpuinfo | grep "physical id" | sort -u |wc -l')
+    system("bash ./Bash/CPU.sh")
 
-def memoria_em_gb():
-    system("free -mg")
+def memoria():
+    system("free -m")
 
+def sys_ver():
+    system("cat /etc/*-release")
 
 def linux_ver():
     system("cat /proc/version")
@@ -30,7 +27,7 @@ def swap():
     system("cat /proc/swaps")
 
 def uso_de_swap():
-    system("grep Swap /proc/meminfo")
+    system("cat /proc/meminfo | grep Swap")
 
 def discos():
     system("df -h")
@@ -41,11 +38,11 @@ def io_discos():
 def status_server():
     system("vmstat 1 5")
 
-def top_processamento():
-    system("htop")
+def top():
+    system("top")
 
 def reboot():
-    system("last reboot")
+    system("last reboot | head -n 1")
 
 def shutdown():
     system("last shutdown")
@@ -53,11 +50,11 @@ def shutdown():
 def print_menu():
     print "0  - Hostname"
     print "1  - Dados da máquina (RedHat >= 7)"
-    print "2  - Versao RHEL"
+    print "2  - Versao OS"
     print "3  - Configurações de Rede"
     print "4  - CPU"
-    print "5  - Memória em GB"
-    print "6  - SWAP"
+    print "5  - Memória"
+    print "6  - Partição SWAP"
     print "7  - Uso de Swap"
     print "8  - Discos"
     print "9  - IO Discos"
@@ -74,35 +71,50 @@ def init():
         opc = int(input())
         print "\n\n" 
         if opc == 0:
+            system("clear")
             hostname()
         elif opc == 1:
+            system("clear")
             hostnamectl()
         elif opc == 2:
+            system("clear")
             sys_ver()
         elif opc == 3:
+            system("clear")
             rede()
         elif opc == 4:
+            system("clear")
             cpu()
         elif opc == 5:
-            memoria_em_gb()
+            system("clear")
+            memoria()
         elif opc == 6:
+            system("clear")
             swap()
         elif opc == 7:
+            system("clear")
             uso_de_swap()
         elif opc == 8:
+            system("clear")
             discos()
         elif opc == 9:
+            system("clear")
             io_discos()
         elif opc == 10:
+            system("clear")
             status_server()
         elif opc == 11:
-            top_processamento()
+            system("clear")
+            top()
         elif opc == 12:
-            reboot()
-        elif opc == 13:
+            system("clear")
             shutdown()
+        elif opc == 13:
+            system("clear")
+            reboot()
         elif opc == 14:
             break
         print "\n\n"
+
 if __name__ == "__main__":
     init()
