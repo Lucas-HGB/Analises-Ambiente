@@ -1,35 +1,31 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
-from platform import system as arch
-global os
-global os = arch().lower()
-if os == "windows":
-    from Windows import init as infra
-elif os == "linux":
-    from Linux import init as infra
-from Oracle import init as Oracle
 
+## Lib imports
+from platform import system as arch
 from os import system
 
-def clear_screen():
-    if os == "windows":
-        system("cls")
-    elif os == "linux":
-        system("clear")
-    else:
-        print "Operating system not recognized"
+## Custom imports
+from Oracle import init as Oracle
+from Linux import init as Infra
 
-opc = 0
-while opc != 3:
+
+def clear_screen():
+    system("clear")
+
+while True:
+    clear_screen()
     print "1 - Infra" 
     print "2 - Banco" 
     print "3 - Sair" 
-    opc = int(input())
-    clear_screen()
+    try:
+        opc = int(input())
+        clear_screen()
+    except NameError:
+        print "Favor inserir um número de 1-3"
     if opc == 1:
-        if os == "windows":
-            infra()
-        elif os == "linux":
-            infra()
+        Infra()
     elif opc == 2:
        Oracle()
+    elif opc == 3:
+        break
