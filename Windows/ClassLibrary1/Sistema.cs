@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Management;
 using System.Linq;
 using System.Net;
 using System.Diagnostics;
@@ -129,8 +130,56 @@ namespace ClassLibrary
             catch (System.Security.SecurityException) { Console.WriteLine("Permission error"); }
 
         }
+
+
+        private ManagementObjectCollection Search_Wmi(string classe)
+        {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM {classe}");
+            return searcher.Get();
+        }
+
+        // Convert Bytes to respective Size Measurement
+        public static string GetReadableSize(Int64 value)
+        {
+            string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+            if (value < 0) { return "-" + GetReadableSize(-value); }
+            if (value == 0) { return "0.0 bytes"; }
+
+            int mag = (int)Math.Log(value, 1024);
+            decimal adjustedSize = (decimal)value / (1L << (mag * 10));
+
+            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+        }
+
+        public void MemoryUsage() {
+            ManagementObjectCollection TaskCollection = Search_Wmi("Win32_PerfRawData_PerfProc_Process");
+            List<String> blacklist = new List<String>() // Blacklist of specific Logs to Hide
+                {
+                   "Idle",
+                   "_Total "
+                };
+            for (int i = 0; i < 500; i++)
+            {
+                blacklist.Add($"svchost#{i}");
+            }
+            Console.WriteLine("PID" + String.Concat(Enumerable.Repeat("-", 5)) + "Name" + String.Concat(Enumerable.Repeat("-", 32)) + "Memory Usage" + String.Concat(Enumerable.Repeat("-", 30)) + "CPU Usage");
+            long total = 0;
+            foreach (ManagementObject task in TaskCollection)
+            {
+                if (!blacklist.Contains(task["Name"]))
+                {
+                    try
+                    {
+
+                        double memUse = Convert.ToInt32(task["WorkingSetPrivate"]);
+                        Console.WriteLine(task["IDProcess"] + String.Concat(Enumerable.Repeat(" ", 8 - Convert.ToString(task["IDProcess"]).Length)) + task["Name"] + String.Concat(Enumerable.Repeat(" ", 38 - Convert.ToString(task["Name"]).Length)) + GetReadableSize(Convert.ToInt32(memUse)));
+                    }
+                    catch (OverflowException) { Console.WriteLine("Error"); }
+                    catch (ArgumentException) { }
+                    
+                }
+            }
+            Console.WriteLine(GetReadableSize(total));
+        }
     }
-
-
-
 }

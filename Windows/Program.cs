@@ -51,6 +51,7 @@ namespace Main
                         break;
                     case 4:
                         Console.Clear();
+                        sys.MemoryUsage();
                         // Memory Usage
                         break;
                     case 5:
