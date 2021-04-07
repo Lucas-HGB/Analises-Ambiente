@@ -5,7 +5,7 @@ from os import system, listdir
 user = None
 password = None
 
-def get_instances():
+def __get_instances():
     #Extrair SID em Linux usando etc/oratab
     instances = []
     try:
@@ -15,9 +15,9 @@ def get_instances():
             print("Oratab Not Found!")
     return instances
 
-def list_instances():
+def __list_instances():
     system("clear")
-    instances = get_instances()
+    instances = __get_instances()
     if len(instances) > 1:
       print "Selecione uma instância"
       for instance,count in zip(instances, range(len(instances))):
@@ -27,14 +27,14 @@ def list_instances():
       return instance[opc]
     else: return instances[0]
 
-def run_command(scriptFile):
+def __run_command(scriptFile):
     if not user: 
       output = system("cat './sql/%s' | sqlplus -s / as sysdba"%(scriptFile))
     else:
       output = system("cat './sql/%s' | sqlplus -s %s/%s"%(scriptFile, user, password))
     return output
 
-def print_menu():
+def __print_menu():
     print "0  - Inserir usuario e senha do banco (caso SYSDBA nao funcione)"
     for script, count in zip(listdir("sql"), range(len(listdir("sql")))):
       if count + 1 < 10:
@@ -55,12 +55,12 @@ def print_menu():
 
 def init():
     global user, password
-    instance = list_instances()
+    instance = __list_instances()
     while True:
-        scriptFile = print_menu()
+        scriptFile = __print_menu()
         system("clear")
         if scriptFile != None and scriptFile != "insert":
-            run_command(scriptFile)
+            __run_command(scriptFile)
         elif scriptFile == None:
             break
         elif scriptFile == "insert":

@@ -2,54 +2,54 @@
 # -*- coding: utf-8 -*-
 from os import system
 
-def hostname():
+def __hostname():
     system("hostname")
 
-def hostnamectl():
+def __hostnamectl():
     system("hostnamectl")
 
-def rede():
+def __rede():
     system("ifconfig")
 
-def cpu():
+def __cpu():
     system('cat /proc/cpuinfo | grep "model name" | sort -u')
     system('physicalCores=$(cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l) && echo "Cores físicos: $physicalCores"')
     system('logicalCores=$(cat /proc/cpuinfo | grep "model name" | wc -l) && echo "Cores lógicos: $logicalCores"')
 
-def memoria():
+def __memoria():
     system("free -m")
 
-def sys_ver():
+def __sys_ver():
     system("cat /etc/*-release")
 
-def linux_ver():
+def __linux_ver():
     system("cat /proc/version")
     
-def swap():
+def __swap():
     system("cat /proc/swaps")
 
-def uso_de_swap():
+def __uso_de_swap():
     system("cat /proc/meminfo | grep Swap")
 
-def discos():
+def __discos():
     system("df -h")
 
-def io_discos():
+def __io_discos():
     system("iostat")
 
-def status_server():
+def __status_server():
     system("vmstat 1 5")
 
-def top():
+def __top():
     system("top")
 
-def reboot():
+def __reboot():
     system("last reboot | head -n 1")
 
-def shutdown():
+def __shutdown():
     system("last shutdown")
 
-def print_menu():
+def __print_menu():
     print "1  - Hostname"
     print "2  - Dados da máquina (RedHat >= 7)"
     print "3  - Versao OS"
@@ -69,51 +69,38 @@ def print_menu():
 def init():
     opc = 0
     while opc != 15:
-        print_menu()
+        __print_menu()
         opc = int(input()) - 1
+        system("clear")
         print "\n\n" 
         if opc == 0:
-            system("clear")
-            hostname()
+            __hostname()
         elif opc == 1:
-            system("clear")
-            hostnamectl()
+            __hostnamectl()
         elif opc == 2:
-            system("clear")
-            sys_ver()
+            __sys_ver()
         elif opc == 3:
-            system("clear")
-            rede()
+            __rede()
         elif opc == 4:
-            system("clear")
-            cpu()
+            __cpu()
         elif opc == 5:
-            system("clear")
-            memoria()
+            __memoria()
         elif opc == 6:
-            system("clear")
-            swap()
+            __swap()
         elif opc == 7:
-            system("clear")
-            uso_de_swap()
+            __uso_de_swap()
         elif opc == 8:
-            system("clear")
-            discos()
+            __discos()
         elif opc == 9:
-            system("clear")
-            io_discos()
+            __io_discos()
         elif opc == 10:
-            system("clear")
-            status_server()
+            __status_server()
         elif opc == 11:
-            system("clear")
-            top()
+            __top()
         elif opc == 12:
-            system("clear")
-            shutdown()
+            __shutdown()
         elif opc == 13:
-            system("clear")
-            reboot()
+            __reboot()
         elif opc == 14:
             break
         print "\n\n"

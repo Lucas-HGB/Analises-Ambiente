@@ -9,17 +9,15 @@ from Oracle import init as Oracle
 from Linux import init as Infra
 
 
-def clear_screen():
-    system("clear")
 
 while True:
-    clear_screen()
+    system("clear")
     print "1 - Infra" 
     print "2 - Banco" 
     print "3 - Sair" 
     try:
         opc = int(input())
-        clear_screen()
+        system("clear")
     except NameError:
         print "Favor inserir um número de 1-3"
     if opc == 1:
