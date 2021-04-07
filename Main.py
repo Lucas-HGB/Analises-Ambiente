@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 ## Lib imports
-from platform import system as arch
 from os import system
 
 ## Custom imports

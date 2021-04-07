@@ -150,36 +150,54 @@ namespace ClassLibrary
 
             return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
         }
-
         public void MemoryUsage() {
             ManagementObjectCollection TaskCollection = Search_Wmi("Win32_PerfRawData_PerfProc_Process");
             List<String> blacklist = new List<String>() // Blacklist of specific Logs to Hide
                 {
                    "Idle",
-                   "_Total "
+                   "svchost",
+                   "SearchFilterHost",
+                   "SearchFilterHost",
+                   "ShellExperienceHost",
+                   "RuntimeBroker",
+                   "RtkAudioService64",
+                   "ServiceHub.ThreadedWaitDialog",
+                   "SearchProtocolHost",
+                   "StartMenuExperienceHost",
+                   "ServiceHub.VSDetouredHost",
+                   "SecurityHealthService",
+                   "Memory Compression",
+                   "IntelCpHDCPSvc",
+                   "SettingSyncHost",
+                   "YourPhone",
+                   "ApplicationFrameHost",
+                   "ServiceHub.SettingsHost",
+                   "ServiceHub.DataWarehouseHost",
+                   "MicrosoftEdgeCP",
+                   "OneApp.IGCC.WinService",
+                   "ServiceHub.Host.CLR.x86",
+                   "Microsoft.ServiceHub.Controller",
+                   "ServiceHub.RoslynCodeAnalysisService",
+                   "TextInputHost",
+                   "MicrosoftEdgeSH",
+                   "fontdrvhost",
+                   "igfxCUIService",
+                   "SecurityHealthSystray",
+                   "ServiceHub.IdentityHost",
+                   "StandardCollector.Service",
+                   "ScriptedSandbox64",
+                   "dllhost",
+                   "WmiPrvSE"
                 };
-            for (int i = 0; i < 500; i++)
+            Process[] processList = Process.GetProcesses();
+            Console.WriteLine("PID" + String.Concat(Enumerable.Repeat("-", 5)) + "Name" + String.Concat(Enumerable.Repeat("-", 32)) + "Memory Usage");
+            foreach (Process processo in processList)
             {
-                blacklist.Add($"svchost#{i}");
-            }
-            Console.WriteLine("PID" + String.Concat(Enumerable.Repeat("-", 5)) + "Name" + String.Concat(Enumerable.Repeat("-", 32)) + "Memory Usage" + String.Concat(Enumerable.Repeat("-", 30)) + "CPU Usage");
-            long total = 0;
-            foreach (ManagementObject task in TaskCollection)
-            {
-                if (!blacklist.Contains(task["Name"]))
+                if (!blacklist.Contains(processo.ProcessName))
                 {
-                    try
-                    {
-
-                        double memUse = Convert.ToInt32(task["WorkingSetPrivate"]);
-                        Console.WriteLine(task["IDProcess"] + String.Concat(Enumerable.Repeat(" ", 8 - Convert.ToString(task["IDProcess"]).Length)) + task["Name"] + String.Concat(Enumerable.Repeat(" ", 38 - Convert.ToString(task["Name"]).Length)) + GetReadableSize(Convert.ToInt32(memUse)));
-                    }
-                    catch (OverflowException) { Console.WriteLine("Error"); }
-                    catch (ArgumentException) { }
-                    
+                    Console.WriteLine(processo.Id + String.Concat(Enumerable.Repeat(" ", 8 - Convert.ToString(processo.Id).Length)) + processo.ProcessName + String.Concat(Enumerable.Repeat(" ", 38 - processo.ProcessName.Length)) + GetReadableSize(Convert.ToInt32(processo.PrivateMemorySize64)));
                 }
             }
-            Console.WriteLine(GetReadableSize(total));
         }
     }
 }

@@ -12,7 +12,9 @@ def rede():
     system("ifconfig")
 
 def cpu():
-    system("bash ./Bash/CPU.sh")
+    system('cat /proc/cpuinfo | grep "model name" | sort -u')
+    system('physicalCores=$(cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l) && echo "Cores físicos: $physicalCores"')
+    system('logicalCores=$(cat /proc/cpuinfo | grep "model name" | wc -l) && echo "Cores lógicos: $logicalCores"')
 
 def memoria():
     system("free -m")
@@ -48,27 +50,27 @@ def shutdown():
     system("last shutdown")
 
 def print_menu():
-    print "0  - Hostname"
-    print "1  - Dados da máquina (RedHat >= 7)"
-    print "2  - Versao OS"
-    print "3  - Configurações de Rede"
-    print "4  - CPU"
-    print "5  - Memória"
-    print "6  - Partição SWAP"
-    print "7  - Uso de Swap"
-    print "8  - Discos"
-    print "9  - IO Discos"
-    print "10 - Coleta de Status do Server"
-    print "11 - Top processamento"
-    print "12 - Last shutdown"
-    print "13 - Last reboot"
-    print "14 - Sair"
+    print "1  - Hostname"
+    print "2  - Dados da máquina (RedHat >= 7)"
+    print "3  - Versao OS"
+    print "4  - Configurações de Rede"
+    print "5  - CPU"
+    print "6  - Memória"
+    print "7  - Partição SWAP"
+    print "8  - Uso de Swap"
+    print "9  - Discos"
+    print "10  - IO Discos"
+    print "11 - Coleta de Status do Server"
+    print "12 - Top processamento"
+    print "13 - Last shutdown"
+    print "14 - Last reboot"
+    print "15 - Sair"
 
 def init():
     opc = 0
-    while opc != 14:
+    while opc != 15:
         print_menu()
-        opc = int(input())
+        opc = int(input()) - 1
         print "\n\n" 
         if opc == 0:
             system("clear")
