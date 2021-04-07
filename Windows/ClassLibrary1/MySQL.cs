@@ -121,12 +121,12 @@ Drop table #fraglist
         private List<String> databases = new List<String>();
         public MySQL()
         {
-            bool login_error = false;
+            bool login_error = true;
             do
             {
                 string database = "mysql";
                 string user = "root";
-                string password = "l40215007";
+                string password = "workdb7084";
                 connection = new MySqlConnection($"server=localhost;database={database};uid={user};pwd={password};");
                 try
                 {
@@ -135,7 +135,6 @@ Drop table #fraglist
                 }
                 catch (MySqlException) { Console.WriteLine("Wrong user/password!"); login_error = true; }
             } while (login_error);
-
         }
 
         private static int Print_Menu()
@@ -149,12 +148,14 @@ Drop table #fraglist
             catch (FormatException) { Console.Clear(); Console.WriteLine("Please insert numeric value!"); }
             return main_menu;
         }
+
         private String Run_Command(String command)
         {
             var cmd = new MySqlCommand(command, connection);
             String output = cmd.ExecuteScalar().ToString();
             return output;
         }
+
         public void Main()
         {
             do

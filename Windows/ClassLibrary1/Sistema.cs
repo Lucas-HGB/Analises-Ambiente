@@ -4,6 +4,8 @@ using System.Management;
 using System.Linq;
 using System.Net;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+
 
 namespace ClassLibrary
 {
@@ -132,7 +134,7 @@ namespace ClassLibrary
         }
 
 
-        private ManagementObjectCollection Search_Wmi(string classe)
+            private ManagementObjectCollection Search_Wmi(string classe)
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM {classe}");
             return searcher.Get();
@@ -150,7 +152,7 @@ namespace ClassLibrary
 
             return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
         }
-        public void MemoryUsage() {
+        public void MemoryUsageCustom() {
             ManagementObjectCollection TaskCollection = Search_Wmi("Win32_PerfRawData_PerfProc_Process");
             List<String> blacklist = new List<String>() // Blacklist of specific Logs to Hide
                 {

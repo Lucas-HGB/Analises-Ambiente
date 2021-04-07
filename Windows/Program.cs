@@ -34,33 +34,28 @@ namespace Main
             do
             {
                 int main_menu = Print_Menu();
+                Console.Clear();
                 switch (main_menu)
                 {
                     case 1:
-                        Console.Clear();
                         infra.list_disks();
                         // Disks
                         break;
                     case 2:
-                        Console.Clear();
                         sys.rede();
                         break;
                     case 3:
-                        Console.Clear();
                         infra.host();
                         break;
                     case 4:
-                        Console.Clear();
-                        sys.MemoryUsage();
+                        sys.MemoryUsageCustom();
                         // Memory Usage
                         break;
                     case 5:
-                        Console.Clear();
                         // CPU Usage
                         break;
                     case 6:
                         // Logs
-                        Console.Clear();
                         Console.WriteLine("1 - Aplicação");
                         Console.WriteLine("2 - Sistema");
                         Console.WriteLine("3 - Segurança");
