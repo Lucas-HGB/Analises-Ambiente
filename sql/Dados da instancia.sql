@@ -1,3 +1,0 @@
-set lines 160
-col HOST_NAME for a60
-select INSTANCE_NAME,STARTUP_TIME,STATUS,VERSION,HOST_NAME from v$instance;
