@@ -28,6 +28,6 @@ e as
 (
   select to_char(round(value,4),'999.99') ||'%' "PGA Hit Ratio (95%-100%)"
   from sys.v_$pgastat
-  where name = 'cache hit percentadf.ge'
+  where name = 'cache hit percentage'
 )
 select * from a,b,c,d,e; 
